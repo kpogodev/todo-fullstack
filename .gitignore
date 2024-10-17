@@ -1,0 +1,43 @@
+# Node modules for all packages
+node_modules/
+**/node_modules/
+packages/**/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# Build output for all packages
+dist/
+build/
+
+# Vite
+.vite/
+
+# Static and cache files
+.cache/
+.vscode/
+.DS_Store
+
+# TypeScript cache and build outputs
+*.tsbuildinfo
+*.d.ts
+*.d.ts.map
+*.js.map
+
+# IntelliJ/WebStorm/VSCode project files
+.idea/
+*.sublime-workspace
+*.vscode/
+
+# Prisma specific files
+prisma/migrations/
+prisma/.env
+
+# MacOS
+.DS_Store
+
