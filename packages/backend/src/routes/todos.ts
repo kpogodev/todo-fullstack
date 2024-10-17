@@ -49,6 +49,14 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
       },
     },
   })
+  app.route({
+    method: 'DELETE',
+    url: '/:id',
+    handler: todosHandlers.deleteTodo,
+    schema: {
+      params: todoSchema.pick({ id: true }),
+    },
+  })
 }
 
 export default todosRoutes

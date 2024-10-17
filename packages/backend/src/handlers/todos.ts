@@ -95,7 +95,7 @@ export const todosHandlers = {
 
       // P2025 error code corresponds to "Record to update not found."
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return res.status(404).send({ message: 'Todo not found' })
+        return res.status(404).send({ message: `Todo with id: ${req.params.id} not found` })
       }
 
       // P2002 error code corresponds to "Unique constraint failed on the constraint."
@@ -103,6 +103,31 @@ export const todosHandlers = {
         return res.status(400).send({ message: 'Todo with the same title already exists' })
       }
       return res.status(500).send({ message: 'An error occurred while updating todo' })
+    }
+  },
+  // @ DELETE /todos/:id
+  // @desc Delete a todo by ID
+  // @access Public (for the scope of this task)
+  deleteTodo: async (
+    req: FastifyRequest<{
+      Params: Pick<TodoDTO, 'id'>
+    }>,
+    res: FastifyReply,
+  ) => {
+    try {
+      const { id } = req.params
+
+      await req.server.prisma.todo.delete({ where: { id } })
+
+      return res.status(204).send()
+    } catch (error) {
+      req.server.log.error(error)
+
+      // P2025 error code corresponds to "Record to update not found."
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return res.status(404).send({ message: `Todo with id: ${req.params.id} not found` })
+      }
+      return res.status(500).send({ message: 'An error occurred while deleting todo' })
     }
   },
 }
