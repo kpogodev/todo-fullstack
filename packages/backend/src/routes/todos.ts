@@ -37,6 +37,18 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
       },
     },
   })
+  app.route({
+    method: 'PUT',
+    url: '/:id',
+    handler: todosHandlers.updateTodo,
+    schema: {
+      params: todoSchema.pick({ id: true }),
+      body: todoSchema.pick({ title: true, description: true, completed: true }).partial(),
+      response: {
+        200: todoSchema,
+      },
+    },
+  })
 }
 
 export default todosRoutes
