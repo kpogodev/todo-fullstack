@@ -1,23 +1,26 @@
-// Import Fastify and fastify-cors
 import fastify from 'fastify'
 import fastifyCors from '@fastify/cors'
+
+import prismaClientPlugin from './plugins/prismaClientPlugin'
+import todosRoutes from './routes/todos'
 
 // Define the port and host
 const PORT = process.env.API_PORT || 5000
 const HOST = process.env.API_HOST || '0.0.0.0'
 
-// Create Fastify instance
+// Create the Fastify instance
 const app = fastify({ logger: true })
 
-// Register fastify-cors with options
+// Register core plugins
 app.register(fastifyCors, {
   origin: '*',
 })
 
-// Define a route
-app.get('/', async (_, res) => {
-  return res.send({ hello: 'world' })
-})
+// Register custom plugins
+app.register(prismaClientPlugin)
+
+// Regiser a routes
+app.register(todosRoutes, { prefix: '/api/todos' })
 
 // Start the server
 app.listen({ port: +PORT, host: HOST }, (err, address) => {
