@@ -3,7 +3,7 @@ import fastifyCors from '@fastify/cors'
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 
 import prismaClientPlugin from './plugins/prismaClientPlugin'
-import zodValidationErrorHandlerPlugin from './plugins/zodValidationErrorHandlerPlugin'
+import customErrors from './plugins/customErrors'
 import todosRoutes from './routes/todos'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 
@@ -27,7 +27,7 @@ app.setSerializerCompiler(serializerCompiler)
 
 // Register custom plugins
 app.register(prismaClientPlugin)
-app.register(zodValidationErrorHandlerPlugin)
+app.register(customErrors)
 
 // Regiser a routes
 app.register(todosRoutes, { prefix: '/api/todos' })

@@ -3,7 +3,7 @@ import { hasZodFastifySchemaValidationErrors, isResponseSerializationError } fro
 
 import type { FastifyPluginAsync } from 'fastify'
 
-const zodValidationErrorHandlerPlugin: FastifyPluginAsync = fp(async (app) => {
+const customErrors: FastifyPluginAsync = fp(async (app) => {
   app.setErrorHandler((error, req, res) => {
     // Check for request validation error
     if (hasZodFastifySchemaValidationErrors(error)) {
@@ -42,4 +42,4 @@ const zodValidationErrorHandlerPlugin: FastifyPluginAsync = fp(async (app) => {
   })
 })
 
-export default zodValidationErrorHandlerPlugin
+export default customErrors
