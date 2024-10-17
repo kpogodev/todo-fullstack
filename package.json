@@ -1,0 +1,19 @@
+{
+  "name": "todo-fullstack",
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/**"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/backend & npm run dev --workspace=packages/frontend",
+    "dev:db": "npm run dev --workspace=packages/backend & npm run dev --workspace=packages/frontend & docker-compose up db",
+    "build": "npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}
