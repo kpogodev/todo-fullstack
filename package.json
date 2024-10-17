@@ -10,6 +10,7 @@
     "build": "npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend"
   },
   "devDependencies": {
+    "@types/node": "^22.7.6",
     "dotenv-cli": "^7.4.2",
     "prettier": "^3.3.3",
     "typescript": "^5.5.3"
