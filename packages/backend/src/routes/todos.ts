@@ -1,9 +1,11 @@
-import { z } from 'zod'
-import { todosHandlers } from '../handlers/todos'
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
-import { todoSchema } from '../dto/todo'
+
+import { todosHandlers } from '../handlers/todos'
+import { todoSchema, createTodoSchema, updateTodoSchema, todoParamsSchema, todosSchema } from '../dto/todos'
+
 import type { FastifyInstance } from 'fastify'
 
+// Group all the routes related to todos
 const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
   app.route({
     method: 'GET',
@@ -11,7 +13,7 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
     handler: todosHandlers.getTodos,
     schema: {
       response: {
-        200: z.array(todoSchema),
+        200: todosSchema,
       },
     },
   })
@@ -20,7 +22,7 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
     url: '/:id',
     handler: todosHandlers.getTodoById,
     schema: {
-      params: todoSchema.pick({ id: true }),
+      params: todoParamsSchema,
       response: {
         200: todoSchema,
       },
@@ -31,7 +33,7 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
     url: '/',
     handler: todosHandlers.createTodo,
     schema: {
-      body: todoSchema.pick({ title: true, description: true }),
+      body: createTodoSchema,
       response: {
         201: todoSchema,
       },
@@ -42,8 +44,8 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
     url: '/:id',
     handler: todosHandlers.updateTodo,
     schema: {
-      params: todoSchema.pick({ id: true }),
-      body: todoSchema.pick({ title: true, description: true, completed: true }).partial(),
+      params: todoParamsSchema,
+      body: updateTodoSchema,
       response: {
         200: todoSchema,
       },
@@ -54,7 +56,7 @@ const todosRoutes: FastifyPluginAsyncZod = async (app: FastifyInstance) => {
     url: '/:id',
     handler: todosHandlers.deleteTodo,
     schema: {
-      params: todoSchema.pick({ id: true }),
+      params: todoParamsSchema,
     },
   })
 }

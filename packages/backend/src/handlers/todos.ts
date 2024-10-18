@@ -1,52 +1,37 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
-import type { TodoDTO } from '../dto/todo'
-import { Prisma } from '@prisma/client'
+import type { CreateTodoDTO, TodoParamsDTO, UpdateTodoDTO, TodosDTO, TodoDTO } from '../dto/todos'
 
 export const todosHandlers = {
   // @ GET /todos
   // @desc Get all todos
   // @access Public
-  getTodos: async (req: FastifyRequest, res: FastifyReply) => {
+  getTodos: async (req: FastifyRequest, res: FastifyReply): Promise<TodosDTO> => {
     try {
       const todos = await req.server.prisma.todo.findMany()
-
-      if (!todos || !todos.length) return res.status(404).send({ message: 'No todos found' })
 
       return res.status(200).send(todos)
     } catch (error) {
       req.server.log.error(error)
-      return res.status(500).send({ message: 'An error occurred while fetching todos' })
+      throw error
     }
   },
   // @ GET /todos/:id
   // @desc Get todo by ID
   // @access Public
-  getTodoById: async (
-    req: FastifyRequest<{
-      Params: Pick<TodoDTO, 'id'>
-    }>,
-    res: FastifyReply,
-  ) => {
+  getTodoById: async (req: FastifyRequest<{ Params: TodoParamsDTO }>, res: FastifyReply): Promise<TodoDTO> => {
     try {
-      const todo = await req.server.prisma.todo.findUnique({ where: { id: req.params.id } })
-
-      if (!todo) return res.status(404).send({ message: `Todo with id: ${req.params.id} not found` })
+      const todo = await req.server.prisma.todo.findUniqueOrThrow({ where: { id: req.params.id } })
 
       return res.status(200).send(todo)
     } catch (error) {
       req.server.log.error(error)
-      return res.status(500).send({ message: 'An error occurred while fetching todo' })
+      throw error
     }
   },
   // @ POST /todos
   // @desc Create a new todo
   // @access Public (for the scope of this task)
-  createTodo: async (
-    req: FastifyRequest<{
-      Body: Pick<TodoDTO, 'title' | 'description'>
-    }>,
-    res: FastifyReply,
-  ) => {
+  createTodo: async (req: FastifyRequest<{ Body: CreateTodoDTO }>, res: FastifyReply): Promise<TodoDTO> => {
     try {
       const { title, description } = req.body
 
@@ -57,31 +42,21 @@ export const todosHandlers = {
       return res.status(201).send(newTodo)
     } catch (error) {
       req.server.log.error(error)
-
-      // P2002 error code corresponds to "Unique constraint failed on the constraint."
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return res.status(400).send({ message: 'Todo with the same title already exists' })
-      }
-      return res.status(500).send({ message: 'An error occurred while creating todo' })
+      throw error
     }
   },
   // @ PUT /todos/:id
   // @desc Update a todo by ID
   // @access Public (for the scope of this task)
   updateTodo: async (
-    req: FastifyRequest<{
-      Params: Pick<TodoDTO, 'id'>
-      Body: Partial<Pick<TodoDTO, 'title' | 'description' | 'completed'>>
-    }>,
+    req: FastifyRequest<{ Params: TodoParamsDTO; Body: UpdateTodoDTO }>,
     res: FastifyReply,
-  ) => {
+  ): Promise<TodoDTO> => {
     try {
-      const { id } = req.params
       const { title, description, completed } = req.body
 
-      // Update the todo in the database using Prisma's update method
       const updatedTodo = await req.server.prisma.todo.update({
-        where: { id },
+        where: { id: req.params.id },
         data: {
           ...(title !== undefined && { title }),
           ...(description !== undefined && { description }),
@@ -92,42 +67,20 @@ export const todosHandlers = {
       return res.status(200).send(updatedTodo)
     } catch (error) {
       req.server.log.error(error)
-
-      // P2025 error code corresponds to "Record to update not found."
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return res.status(404).send({ message: `Todo with id: ${req.params.id} not found` })
-      }
-
-      // P2002 error code corresponds to "Unique constraint failed on the constraint."
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return res.status(400).send({ message: 'Todo with the same title already exists' })
-      }
-      return res.status(500).send({ message: 'An error occurred while updating todo' })
+      throw error
     }
   },
   // @ DELETE /todos/:id
   // @desc Delete a todo by ID
   // @access Public (for the scope of this task)
-  deleteTodo: async (
-    req: FastifyRequest<{
-      Params: Pick<TodoDTO, 'id'>
-    }>,
-    res: FastifyReply,
-  ) => {
+  deleteTodo: async (req: FastifyRequest<{ Params: TodoParamsDTO }>, res: FastifyReply): Promise<void> => {
     try {
-      const { id } = req.params
-
-      await req.server.prisma.todo.delete({ where: { id } })
+      await req.server.prisma.todo.delete({ where: { id: req.params.id } })
 
       return res.status(204).send()
     } catch (error) {
       req.server.log.error(error)
-
-      // P2025 error code corresponds to "Record to update not found."
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return res.status(404).send({ message: `Todo with id: ${req.params.id} not found` })
-      }
-      return res.status(500).send({ message: 'An error occurred while deleting todo' })
+      throw error
     }
   },
 }
