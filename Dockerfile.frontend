@@ -8,7 +8,7 @@ COPY package*.json ./
 COPY packages/frontend/package*.json ./packages/frontend/
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source files
 COPY . .

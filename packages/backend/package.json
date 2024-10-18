@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "dotenv -e ../../.env -- ts-node-dev src/main.ts",
     "build": "tsc",
